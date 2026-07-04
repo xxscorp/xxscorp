@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XXS Corp | Creative Agency Depok</title>
+
+  <meta name="description" content="XXS Corporation - Creative Agency, Web Development & Digital Ads di Bogor. Hubungi kami sekarang!">
+  <meta property="og:title" content="XXS Corp | Creative Agency">
+  <meta property="og:image" content="https://i.imgur.com/XhesgxQ.jpeg">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg-overlay: rgba(0,0,0,0.85);
+      --glass-bg: rgba(10, 10, 10, 0.6);
+      --text-main: #f5f5f7;
+      --text-sub: #9ca3af;
+    }
+    html.light {
+      --bg-overlay: rgba(255,255,255,0.7);
+      --glass-bg: rgba(255, 255, 255, 0.6);
+      --text-main: #111827;
+      --text-sub: #4b5563;
+    }
+    @media (prefers-color-scheme: light) {
+      html:not(.dark):not(.light) {
+        --bg-overlay: rgba(255,255,255,0.7);
+        --glass-bg: rgba(255, 255, 255, 0.6);
+        --text-main: #111827;
+        --text-sub: #4b5563;
+      }
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      background: url('https://i.imgur.com/XhesgxQ.jpeg') center/cover fixed;
+      transition: color 0.3s ease;
+    }
+ .overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-overlay);
+      z-index: -1;
+      transition: background 0.3s ease;
+    }
+ .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+ .link-btn {
+      transition: all 0.25s ease;
+      min-height: 72px;
+    }
+ .link-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(220, 38, 38, 0.2);
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+    }
+ .logo-video {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 60px rgba(220, 38, 38, 0.8), 0 0 100px rgba(220, 38, 38, 0.4);
+      border: 2px solid #8B0000;
+    }
+    #toast {
+      position: fixed;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: bottom 0.5s ease;
+      z-index: 100;
+    }
+    #toast.show { bottom: 30px; }
+ .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+    }
+ .modal.active { display: flex; }
+ .floating-wa {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 40;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+  <div class="overlay"></div>
+
+  <a href="https://wa.me6281412164710" target="_blank" class="floating-wa bg-green-500 p-4 rounded-full shadow-lg">
+    <i class="fa-brands fa-whatsapp text-3xl text-white"></i>
+  </a>
+
+  <div id="toast" class="glass px-6 py-3 rounded-full text-sm font-semibold">
+    <i class="fa-solid fa-circle-check text-green-400 mr-2"></i>
+    <span id="toastText">Link berhasil dicopy!</span>
+  </div>
+
+  <div id="paymentModal" class="modal p-4" onclick="closeModal('paymentModal')">
+    <div class="glass p-6 rounded-3xl text-center w-full max-w-sm" onclick="event.stopPropagation()">
+      <h3 class="text-xl font-bold mb-2">Pembayaran DP</h3>
+      <p class="text-xs mb-4" style="color: var(--text-sub)">Scan QRIS untuk bayar DP 50%</p>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=QRISCONTOH" class="w-48 h-48 mx-auto bg-white p-2 rounded-2xl">
+      <p class="text-xs mt-4" style="color: var(--text-sub)">a.n XXS Corporation</p>
+      <button onclick="closeModal('paymentModal')" class="mt-5 glass px-6 py-2 rounded-full text-sm w-full">Tutup</button>
+    </div>
+  </div>
+
+  <div id="qrModal" class="modal p-4" onclick="closeModal('qrModal')">
+    <div class="glass p-6 rounded-3xl text-center" onclick="event.stopPropagation()">
+      <h3 class="text-xl font-bold mb-4">Scan QR Code</h3>
+      <div id="qrcode" class="bg-white p-4 rounded-2xl mx-auto w-fit"></div>
+      <button onclick="closeModal('qrModal')" class="mt-5 glass px-6 py-2 rounded-full text-sm">Tutup</button>
+    </div>
+  </div>
+
+  <div id="analyticsModal" class="modal p-4" onclick="closeModal('analyticsModal')">
+    <div class="glass p-6 rounded-3xl w-full max-w-sm" onclick="event.stopPropagation()">
+      <h3 class="text-xl font-bold mb-4">Link Analytics</h3>
+      <div id="analyticsList" class="space-y-2 text-sm"></div>
+      <button onclick="closeModal('analyticsModal')" class="mt-5 glass px-6 py-2 rounded-full text-sm w-full">Tutup</button>
+    </div>
+  </div>
+
+  <div class="w-full max-w-md mx-auto relative z-10 py-8">
+
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex gap-2">
+        <button onclick="setLang('id')" id="btnId" class="glass px-3 py-2 rounded-full text-xs font-bold bg-red-600">ID</button>
+        <button onclick="setLang('en')" id="btnEn" class="glass px-3 py-2 rounded-full text-xs font-bold">EN</button>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="openModal('analyticsModal')" class="glass p-3 rounded-full text-lg">
+          <i class="fa-solid fa-chart-line"></i>
+        </button>
+        <button onclick="showQR()" class="glass p-3 rounded-full text-lg">
+          <i class="fa-solid fa-qrcode"></i>
+        </button>
+        <button onclick="toggleTheme()" id="themeBtn" class="glass p-3 rounded-full text-lg">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="text-center mb-8">
+      <div class="w-24 h-24 mx-auto mb-5">
+        <video class="logo-video" autoplay loop muted playsinline>
+          <source src="https://i.imgur.com/tQTpdsF.mp4" type="video/mp4">
+          <img src="https://i.imgur.com/XhesgxQ.jpeg" class="logo-video" alt="XXS">
+        </video>
+      </div>
+      <h1 class="text-3xl font-bold mb-2">XXS Corporation</h1>
+      <p class="text-sm" style="color: var(--text-sub)" data-lang-id="Creative Agency • Web Dev • Digital Ads" data-lang-en="Creative Agency • Web Dev • Digital Ads">Creative Agency • Web Dev • Digital Ads</p>
+      <p class="text-xs mt-2" style="color: var(--text-sub)">Bogor, Indonesia</p>
+    </div>
+
+    <div class="space-y-4">
+      <a href="https://wa.me/6281412164710" target="_blank" onclick="trackClick('WhatsApp')"
+         class="link-btn glass w-full flex items-center justify-between px-5 py-4 rounded-2xl">
+        <div class="flex items-center gap-4">
+          <i class="fa-brands fa-whatsapp text-3xl text-green-400"></i>
+          <div class="text-left">
+            <span class="font-bold block text-base">WhatsApp</span>
+            <span class="text-xs" style="color: var(--text-sub)" data-lang-id="Chat langsung dengan kami" data-lang-en="Chat with us directly">Chat langsung dengan kami</span>
+          </div>
+        </div>
+        <i class="fa-solid fa-arrow-up-right-from-square text-gray-500"></i>
+      </a>
+
+      <a href="https://www.instagram.com/xxscorporation?igsh=b20wanVnMHVmeW5x" target="_blank" onclick="trackClick('Instagram')"
+         class="link-btn glass w-full flex items-center justify-between px-5 py-4 rounded-2xl">
+        <div class="flex items-center gap-4">
+          <i class="fa-brands fa-instagram text-3xl text-pink-400"></i>
+          <div class="text-left">
+            <span class="font-bold block text-base">Instagram</span>
+            <span class="text-xs" style="color: var(--text-sub)">@xxscorp</span>
+          </div>
+        </div>
+        <i class="fa-solid fa-arrow-up-right-from-square text-gray-500"></i>
+      </a>
+
+      <a href="https://tiktok.com/@xxscorporation" target="_blank" onclick="trackClick('TikTok')"
+         class="link-btn glass w-full flex items-center justify-between px-5 py-4 rounded-2xl">
+        <div class="flex items-center gap-4">
+          <i class="fa-brands fa-tiktok text-3xl"></i>
+          <div class="text-left">
+            <span class="font-bold block text-base">TikTok</span>
+            <span class="text-xs" style="color: var(--text-sub)">@xxscorp</span>
+          </div>
+        </div>
+        <i class="fa-solid fa-arrow-up-right-from-square text-gray-500"></i>
+      </a>
+
+      <button onclick="downloadVCard(); trackClick('vCard')"
+         class="link-btn glass w-full flex items-center justify-between px-5 py-4 rounded-2xl">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-address-card text-3xl text-yellow-400"></i>
+          <div class="text-left">
+            <span class="font-bold block text-base" data-lang-id="Simpan Kontak" data-lang-en="Save Contact">Simpan Kontak</span>
+            <span class="text-xs" style="color: var(--text-sub)" data-lang-id="Download vCard" data-lang-en="Download vCard">Download vCard</span>
+          </div>
+        </div>
+        <i class="fa-solid fa-download text-gray-500"></i>
+      </button>
+
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="openModal('paymentModal'); trackClick('Payment')"
+           class="link-btn glass flex items-center justify-between px-4 py-4 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-qrcode text-2xl text-cyan-400"></i>
+            <div class="text-left">
+              <span class="font-bold block text-sm">QRIS</span>
+              <span class="text-xs" style="color: var(--text-sub)">Bayar DP</span>
+            </div>
+          </div>
+        </button>
+
+        <a href="https://xxscorp.com" target="_blank" onclick="trackClick('Website')"
+           class="link-btn glass flex items-center justify-between px-4 py-4 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-globe text-2xl text-blue-400"></i>
+            <div class="text-left">
+              <span class="font-bold block text-sm">Website</span>
+              <span class="text-xs" style="color: var(--text-sub)">xxscorp.com</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs"></i>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="text-center mt-12 text-xs" style="color: var(--text-sub)">
+      <p>© 2026 XXS Corporation</p>
+      <p class="mt-1">Genjutsu Marketing 🐦‍⬛</p>
+    </div>
+
+  </div>
+
+  <script>
+    let analytics = JSON.parse(localStorage.getItem('xxs_analytics') || '{}');
+    function trackClick(name) {
+      analytics[name] = (analytics[name] || 0) + 1;
+      localStorage.setItem('xxs_analytics', JSON.stringify(analytics));
+      updateAnalytics();
+    }
+    function updateAnalytics() {
+      const list = document.getElementById('analyticsList');
+      list.innerHTML = Object.entries(analytics).map(([key, val]) =>
+        `<div class="flex justify-between glass px-4 py-2 rounded-xl"><span>${key}</span><span class="font-bold">${val}x</span></div>`
+      ).join('') || '<p class="text-center text-gray-500">Belum ada data</p>';
+    }
+    updateAnalytics();
+
+    function setLang(lang) {
+      document.querySelectorAll('[data-lang-id]').forEach(el => {
+        el.innerText = el.getAttribute(`data-lang-${lang}`);
+      });
+      document.getElementById('btnId').classList.toggle('bg-red-600', lang === 'id');
+      document.getElementById('btnEn').classList.toggle('bg-red-600', lang === 'en');
+      localStorage.setItem('lang', lang);
+    }
+    if (localStorage.getItem('lang') === 'en') setLang('en');
+
+    function downloadVCard() {
+      const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:XXS Corporation
+ORG:XXS Corp
+TEL;TYPE=WORK,VOICE:+6281412164710
+EMAIL:hello@xxscorp.com
+URL:https://xxscorp.com
+ADR:;;Bogor;Indonesia
+END:VCARD`;
+      const blob = new Blob([vcard], { type: 'text/vcard' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'XXSCorp.vcf';
+      a.click();
+      showToast('vCard berhasil didownload!');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const btn = document.getElementById('themeBtn');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    if (!localStorage.getItem('theme')) {
+      if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('light');
+        document.getElementById('themeBtn').innerHTML = '<i class="fa-solid fa-moon"></i>';
+      }
+    } else if (localStorage.getItem('theme') === 'light') {
+      toggleTheme();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastText').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+    function showQR() {
+      const qrDiv = document.getElementById('qrcode');
+      qrDiv.innerHTML = '';
+      new QRCode(qrDiv, {
+        text: window.location.href,
+        width: 180,
+        height: 180,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+      });
+      openModal('qrModal');
+    }
+  </script>
+  
+
+</body>
+</html> 
